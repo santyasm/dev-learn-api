@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Course;
 use App\Models\User;
-use App\Services\GumletService;
 use Exception;
-use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
@@ -45,11 +44,7 @@ class CourseController extends Controller
         try {
             $data = $request->validated();
 
-            $instructor = User::findOrFail($data['user_instructor_id']);
-
-            if ($instructor->role !== "instructor") {
-                return response()->json(["message" => "invalid instructor user"], 404);
-            }
+            $this->validateInstructor($data['user_instructor_id']);
 
             $course = Course::create(
                 $data
@@ -62,5 +57,36 @@ class CourseController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function update(UpdateCourseRequest $request, string $id)
+    {
+        $data = $request->validated();
+        try {
+
+            $course = Course::findOrFail($id);
+
+            if (!empty($data['user_instructor_id'])) {
+                $this->validateInstructor($data['user_instructor_id']);
+            }
+
+            $course->update($data);
+
+            return response()->json(['message' => 'Course updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred during course update.',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    private function validateInstructor($id)
+    {
+        $instructor = User::findOrFail($id);
+        if ($instructor->role !== "instructor") {
+            throw new Exception("Invalid instructor user");
+        }
+        return $instructor;
     }
 }

@@ -13,5 +13,5 @@ Route::get('/users', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+    Route::apiResource('/courses', CourseController::class);
 });
