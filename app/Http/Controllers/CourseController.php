@@ -6,10 +6,38 @@ use App\Http\Requests\StoreCourseRequest;
 use App\Models\Course;
 use App\Models\User;
 use App\Services\GumletService;
+use Exception;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
+    public function index()
+    {
+        try {
+            $courses = Course::all();
+
+            return response()->json($courses);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'message' => 'An error occurred while listing the course',
+                'error' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function show(string $id)
+    {
+        try {
+            $course = Course::findOrFail($id);
+
+            return response()->json($course);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'message' => 'An error occurred while show the course',
+                'error' => $ex->getMessage()
+            ], 404);
+        }
+    }
 
     public function store(StoreCourseRequest $request)
     {
