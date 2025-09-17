@@ -81,6 +81,26 @@ class CourseController extends Controller
         }
     }
 
+    public function destroy(string $id)
+    {
+        try {
+
+            $courseRemoved = Course::destroy($id);
+
+            if (!$courseRemoved) {
+                throw new Exception();
+            }
+
+            return response()->json(null, 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred during course deletion.',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    // Assistants
     private function validateInstructor($id)
     {
         $instructor = User::findOrFail($id);
