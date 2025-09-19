@@ -18,11 +18,18 @@ class Course extends Model
         'level',
         'price',
         'status',
-        'user_instructor_id'
+        'user_instructor_id',
+        'category',
+        "duration_in_seconds"
     ];
 
     public function instructor()
     {
-        return $this->belongsTo(User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'user_instructor_id');
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class, 'course_id');
     }
 }
