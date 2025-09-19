@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,19 +39,15 @@ class AuthController extends Controller
         }
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
+        $validatedData = $request->validated();
         try {
-            $request->validate([
-                "name" => "required|string|max:255",
-                "email" => "required|email|unique:users",
-                "password" => "required|string|min:8"
-            ]);
 
             $user = User::create([
-                "name" => $request->name,
-                "email" => $request->email,
-                "password" => $request->password,
+                "name" => $validatedData["name"],
+                "email" => $validatedData["email"],
+                "password" => $validatedData["password"],
             ]);
 
             $token = $user->createToken('auth-token')->plainTextToken;
@@ -64,7 +61,6 @@ class AuthController extends Controller
                 ],
             ], 201);
         } catch (ValidationException $e) {
-
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
