@@ -28,7 +28,8 @@ class StoreCourseRequest extends FormRequest
             'thumbnail'   => 'nullable|string',
             'level'       => 'in:beginner,intermediate,advanced',
             'price'       => 'numeric|min:0',
-            "user_instructor_id" => "required|exists:users,id"
+            "user_instructor_id" => "required|exists:users,id",
+            "category" => "required|string"
         ];
     }
 }
