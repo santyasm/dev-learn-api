@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('thumbnail')->nullable();
             $table->string('category')->nullable();
             $table->enum('level', ['beginner', 'intermediate', 'advanced'])->default('beginner');
-            $table->string('duration')->nullable();
+            $table->bigInteger('duration_in_seconds')->nullable();
             $table->decimal('price', 8, 2)->default(0);
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->float('rating')->default(0);
