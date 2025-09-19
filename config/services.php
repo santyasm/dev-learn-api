@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'gumlet' => [
+        'api_key' => env('GUMLET_API_KEY'),
+        'base_url' => env('GUMLET_API_BASE_URL'),
+        'collection_id' => env('GUMLET_API_COLLECTION_ID')
+    ],
+
+
 ];
