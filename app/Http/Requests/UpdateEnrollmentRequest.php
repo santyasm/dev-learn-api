@@ -23,7 +23,7 @@ class UpdateEnrollmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "progress"  => "nullable|integer|min:0|max:100"
+            "progress"  => "sometimes|integer|min:0|max:100"
         ];
     }
 }

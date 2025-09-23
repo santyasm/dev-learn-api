@@ -63,11 +63,11 @@ class EnrollmentController extends Controller
         try {
             $enrollment = Enrollment::findOrFail($id);
 
-            $enrollmentUpdated = $enrollment->update($data);
+            $enrollment->update($data);
 
             return response()->json([
                 'message' => 'Enrollment updated successfully.',
-                'data'    => $enrollmentUpdated
+                'data'    => $enrollment
             ], 201);
         } catch (\Exception $ex) {
             return response()->json([
