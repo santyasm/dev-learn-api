@@ -19,7 +19,13 @@ class Video extends Model
         "duration_in_seconds"
     ];
 
-    public function course() {
+    public function course()
+    {
         return $this->belongsTo(Course::class, 'course_id');
+    }
+
+    public function videoProgresses()
+    {
+        return $this->hasMany(VideoProgress::class);
     }
 }
