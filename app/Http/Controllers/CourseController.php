@@ -7,18 +7,30 @@ use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Course;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
+
     public function index()
     {
         try {
-            $courses = Course::with('instructor')->get();
+            $query = Course::with('instructor')
+                ->withCount('enrollments');
+
+            if (Auth::check()) {
+                $userId = Auth::id();
+                $query->with(['enrollments' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }]);
+            }
+
+            $courses = $query->get();
 
             return response()->json($courses);
         } catch (\Exception $ex) {
             return response()->json([
-                'message' => 'An error occurred while listing the course',
+                'message' => 'An error occurred while listing the courses.',
                 'error' => $ex->getMessage()
             ], 500);
         }
@@ -27,7 +39,7 @@ class CourseController extends Controller
     public function show(string $id)
     {
         try {
-            $course = Course::with("instructor", "videos")->findOrFail($id);
+            $course = Course::with("instructor", "videos", "enrollments")->findOrFail($id);
 
             return response()->json($course);
         } catch (\Exception $ex) {
@@ -40,7 +52,6 @@ class CourseController extends Controller
 
     public function store(StoreCourseRequest $request)
     {
-
         try {
             $data = $request->validated();
 
