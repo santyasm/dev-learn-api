@@ -30,6 +30,18 @@ class EnrollmentController extends Controller
     public function store(StoreEnrollmentRequest $request)
     {
         $data = $request->validated();
+
+        $loggedInUser = Auth::user();
+
+        // Only allow the request if the user is an admin OR
+        // if the user_id in the request matches the logged-in user's ID.
+        // This is crucial to prevent a regular user from enrolling other users.
+        if (!$loggedInUser->isAdmin() && $data['user_id'] !== $loggedInUser->id) {
+            return response()->json([
+                'message' => 'Unauthorized: You can only create an enrollment for your own account.'
+            ], 403);
+        }
+
         try {
             $enrollment = Enrollment::create($data);
 
