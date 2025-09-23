@@ -14,15 +14,13 @@ class OptionalAuthenticate
             if (!empty($guards)) {
                 foreach ($guards as $guard) {
                     if (Auth::guard($guard)->check()) {
-                        // Usuário autenticado com sucesso
                         break;
                     }
                 }
             } else {
-                Auth::shouldUse('sanctum'); // usa o guard padrão se necessário
+                Auth::shouldUse('sanctum');
             }
         } catch (\Exception $e) {
-            // falha na autenticação é ignorada
         }
 
         return $next($request);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportVideosRequest;
 use App\Http\Requests\StoreVideoRequest;
+use App\Http\Requests\UpdateVideoRequest;
 use App\Models\Course;
 use App\Models\Video;
 use App\Services\GumletService;
@@ -18,6 +19,22 @@ class VideoController extends Controller
     public function __construct(GumletService $gumlet)
     {
         $this->gumlet = $gumlet;
+    }
+
+    public function index()
+    {
+        try {
+            $videos = Video::all();
+
+
+            return response()->json($videos);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while the video listing.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -58,6 +75,25 @@ class VideoController extends Controller
             ], 500);
         }
     }
+
+    public function update(UpdateVideoRequest $request, string $id)
+    {
+        $data = $request->validated();
+        try {
+            $video = Video::findOrFail($id);
+
+            $video->update($data);
+
+            return response()->json(["message" => "Video updated successfully"]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while updating the videos.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     /**
      * Importa vídeos de uma playlist do Gumlet e os salva no banco de dados.
