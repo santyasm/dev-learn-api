@@ -82,7 +82,8 @@ class EnrollmentController extends Controller
         try {
             $enrollment = Enrollment::with([
                 'course' => function ($query) {
-                    $query->with('instructor', 'videos');
+                    $query->with('instructor', 'videos')
+                        ->withCount('enrollments'); // Adiciona a contagem de matrículas ao curso
                 },
                 'completedVideos'
             ])->findOrFail($id);
@@ -103,6 +104,11 @@ class EnrollmentController extends Controller
             return response()->json([
                 'data' => $enrollment
             ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $mnfe) {
+            return response()->json([
+                'message' => 'Enrollment not found.',
+                'error' => $mnfe->getMessage()
+            ], 404);
         } catch (\Exception $ex) {
             return response()->json([
                 'message' => 'An error occurred during listing enrollment',
