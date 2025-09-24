@@ -547,6 +547,325 @@
                     }
                 ]
             }
+        },
+        "/api/videos": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Lista todos os vídeos",
+                "description": "Retorna uma lista de todos os vídeos.",
+                "operationId": "af0d3163c12f615e3e97f9dc9472b3df",
+                "responses": {
+                    "200": {
+                        "description": "Lista de vídeos retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Video"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Cria um novo vídeo (APENAS ADMIN)",
+                "description": "Armazena um novo vídeo, associa a um curso e atualiza a duração total do curso. Requer role 'admin'.",
+                "operationId": "224b0b473253bfa82a148d8c3a860374",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "course_id",
+                                    "gumlet_asset_id",
+                                    "video_order"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "course_id": {
+                                        "description": "ID do Curso",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "gumlet_asset_id": {
+                                        "description": "ID do Asset no Gumlet",
+                                        "type": "string"
+                                    },
+                                    "video_order": {
+                                        "description": "Ordem do vídeo no curso",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Vídeo criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Video"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Proibido: Apenas admin pode realizar esta ação"
+                    },
+                    "500": {
+                        "description": "Erro interno no servidor ou Asset não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/videos/{video}": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Busca um vídeo específico",
+                "description": "Retorna os detalhes de um vídeo pelo ID.",
+                "operationId": "0678e04c6e8e7fddc95d71a7454304bf",
+                "parameters": [
+                    {
+                        "name": "video",
+                        "in": "path",
+                        "description": "UUID do vídeo",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes do vídeo retornados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Video"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Vídeo não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/videos/{id}": {
+            "put": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Atualiza um vídeo existente (APENAS ADMIN)",
+                "description": "Atualiza os dados de um vídeo pelo ID. Requer role 'admin'.",
+                "operationId": "9455586d7f731480a115f7d81a9cfcee",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID do vídeo",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "video_order": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vídeo atualizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Video updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Proibido: Apenas admin pode realizar esta ação"
+                    },
+                    "404": {
+                        "description": "Vídeo não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Deleta um vídeo (APENAS ADMIN)",
+                "description": "Remove um vídeo pelo seu ID. Requer role 'admin'.",
+                "operationId": "ed3847155f59fa5133a57779d84b099a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID do vídeo",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Vídeo deletado com sucesso (No Content)"
+                    },
+                    "400": {
+                        "description": "Erro na deleção"
+                    },
+                    "403": {
+                        "description": "Proibido: Apenas admin pode realizar esta ação"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/videos/import": {
+            "post": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Importa vídeos de uma playlist do Gumlet (APENAS ADMIN)",
+                "description": "Deleta vídeos existentes do curso e importa uma nova lista de assets de uma playlist Gumlet. Requer role 'admin'.",
+                "operationId": "c4f20018cad38206b03a17e0bb722afc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "playlist_id",
+                                    "course_id"
+                                ],
+                                "properties": {
+                                    "playlist_id": {
+                                        "description": "ID da playlist no Gumlet",
+                                        "type": "string"
+                                    },
+                                    "course_id": {
+                                        "description": "ID do curso para associar os vídeos",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vídeos importados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Videos from playlist successfully imported."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Proibido: Apenas admin pode realizar esta ação"
+                    },
+                    "500": {
+                        "description": "Erro de importação ou Playlist não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -680,6 +999,53 @@
                     }
                 },
                 "type": "object"
+            },
+            "Video": {
+                "title": "Video",
+                "description": "Detalhes de um vídeo de curso",
+                "properties": {
+                    "id": {
+                        "description": "UUID do vídeo",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "description": "Título do vídeo",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Descrição do vídeo",
+                        "type": "string"
+                    },
+                    "course_id": {
+                        "description": "ID do curso ao qual pertence",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "gumlet_asset_id": {
+                        "description": "ID do asset no Gumlet",
+                        "type": "string"
+                    },
+                    "video_order": {
+                        "description": "Ordem do vídeo no curso",
+                        "type": "integer"
+                    },
+                    "duration_in_seconds": {
+                        "description": "Duração do vídeo em segundos",
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "description": "Data de criação",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Data da última atualização",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -698,6 +1064,10 @@
         {
             "name": "Courses",
             "description": "Courses"
+        },
+        {
+            "name": "Videos",
+            "description": "Videos"
         }
     ]
 }

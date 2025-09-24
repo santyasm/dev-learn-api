@@ -24,7 +24,10 @@ class UpdateVideoRequest extends FormRequest
     {
         return [
             "course_id" => "sometimes|string|exists:courses,id",
-            "video_order" => "sometimes|integer|min:0"
+            "video_order" => "sometimes|integer|min:0",
+            "title" => "sometimes|string",
+            "description" => "sometimes|string",
+            "duration_in_seconds" => "sometimes|integer",
         ];
     }
 }
