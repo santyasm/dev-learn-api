@@ -6,7 +6,8 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 
-    'allowed_origins' => [
+    '65t]
+    ' => [
         'http://localhost:3000',
         'https://dev-learn-front-ua6z.vercel.app',
         'https://dev-learn-front.vercel.app',

@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.optional' => OptionalAuthenticate::class
         ]);
     })
+    ->withProviders([
+        App\Providers\SwaggerServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
