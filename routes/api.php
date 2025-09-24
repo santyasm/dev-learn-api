@@ -18,10 +18,19 @@ Route::get('/courses', [CourseController::class, 'index'])->middleware('auth.opt
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('courses', CourseController::class)->except(['index']);
-    Route::apiResource('/videos', VideoController::class);
 
-    Route::post('/videos/import', [VideoController::class, 'importVideosFromGumletPlaylist']);
+    Route::get('/videos', [VideoController::class, 'index']);
+    Route::get('/videos/{video}', [VideoController::class, 'show']);
 
+    // --- Rotas de VIDEOS RESTRITAS (apenas para admins) ---
+    Route::middleware('admin.only')->group(function () {
+        Route::post('/videos', [VideoController::class, 'store']);
+        Route::put('/videos/{id}', [VideoController::class, 'update']);
+        Route::post('/videos/import', [VideoController::class, 'importVideosFromGumletPlaylist']);
+        Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
+    });
+
+    // Rotas de USUÁRIOS
     Route::apiResource('/users', UserController::class);
 
     Route::controller(UserController::class)->group(function () {
@@ -31,9 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/user', 'destroySelf');
     });
 
+    // Rotas de MATRÍCULAS
     Route::apiResource('/enrollments', EnrollmentController::class);
     Route::get('/user/enrollments', [EnrollmentController::class, "getMyEnrollments"]);
-
 
     Route::post('/videos/{enrollment}/{video}/complete', [VideoProgressController::class, 'store'])
         ->name('videos.complete.store');

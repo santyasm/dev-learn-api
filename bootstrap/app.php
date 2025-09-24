@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.optional' => OptionalAuthenticate::class
         ]);
     })
+    ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'admin.only' => \App\Http\Middleware\AdminOnly::class,
+        ]);
+    })
     ->withProviders([
         App\Providers\SwaggerServiceProvider::class,
     ])
