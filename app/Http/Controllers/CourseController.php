@@ -8,10 +8,33 @@ use App\Models\Course;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use OpenApi\Annotations as OA;
 
 class CourseController extends Controller
 {
-
+    /**
+     * @OA\Get(
+     * path="/api/courses",
+     * tags={"Courses"},
+     * summary="Lista todos os cursos",
+     * description="Retorna uma lista de todos os cursos, incluindo o instrutor e a contagem de matrículas. Inclui status de matrícula para o usuário logado.",
+     * @OA\Response(
+     * response=200,
+     * description="Operação bem-sucedida",
+     * @OA\JsonContent(
+     * type="array",
+     * @OA\Items(ref="#/components/schemas/Course")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Erro interno no servidor"
+     * ),
+     * security={
+     * {"bearerAuth": {}}
+     * }
+     * )
+     */
     public function index()
     {
         try {
@@ -36,6 +59,33 @@ class CourseController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     * path="/api/courses/{id}",
+     * tags={"Courses"},
+     * summary="Mostra um curso específico",
+     * description="Retorna os detalhes de um curso, incluindo instrutor, vídeos e matrículas.",
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="UUID do curso",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Operação bem-sucedida",
+     * @OA\JsonContent(ref="#/components/schemas/Course")
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Curso não encontrado"
+     * ),
+     * security={
+     * {"bearerAuth": {}}
+     * }
+     * )
+     */
     public function show(string $id)
     {
         try {
@@ -50,6 +100,39 @@ class CourseController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     * path="/api/courses",
+     * tags={"Courses"},
+     * summary="Cria um novo curso",
+     * description="Registra um novo curso. Requer autenticação e validação do instrutor.",
+     * security={{"bearerAuth": {}}},
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"title", "description", "user_instructor_id"},
+     * @OA\Property(property="title", type="string"),
+     * @OA\Property(property="description", type="string"),
+     * @OA\Property(property="thumbnail", type="string", nullable=true),
+     * @OA\Property(property="price", type="number", format="float"),
+     * @OA\Property(property="level", type="string", enum={"beginner", "intermediate", "advanced"}),
+     * @OA\Property(property="status", type="string", enum={"draft", "published", "archived"}),
+     * @OA\Property(property="user_instructor_id", type="string", format="uuid", description="ID do instrutor"),
+     * @OA\Property(property="category", type="string"),
+     * @OA\Property(property="duration_in_seconds", type="integer")
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Curso criado com sucesso",
+     * @OA\JsonContent(ref="#/components/schemas/Course")
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Erro durante o registro ou instrutor inválido"
+     * )
+     * )
+     */
     public function store(StoreCourseRequest $request)
     {
         try {
@@ -70,6 +153,46 @@ class CourseController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     * path="/api/courses/{id}",
+     * tags={"Courses"},
+     * summary="Atualiza um curso existente",
+     * description="Atualiza os dados de um curso pelo ID.",
+     * security={{"bearerAuth": {}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="UUID do curso",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * @OA\Property(property="title", type="string"),
+     * @OA\Property(property="description", type="string"),
+     * @OA\Property(property="price", type="number", format="float"),
+     * @OA\Property(property="user_instructor_id", type="string", format="uuid", description="ID do instrutor (opcional)"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Curso atualizado com sucesso",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Course updated successfully")
+     * )
+     * ),
+     * @OA\Response(
+     * response=400,
+     * description="Erro na atualização ou validação"
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Curso não encontrado"
+     * )
+     * )
+     */
     public function update(UpdateCourseRequest $request, string $id)
     {
         $data = $request->validated();
@@ -92,6 +215,31 @@ class CourseController extends Controller
         }
     }
 
+
+    /**
+     * @OA\Delete(
+     * path="/api/courses/{id}",
+     * tags={"Courses"},
+     * summary="Deleta um curso",
+     * description="Remove um curso pelo seu ID.",
+     * security={{"bearerAuth": {}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="UUID do curso",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Curso deletado com sucesso (Sem conteúdo)"
+     * ),
+     * @OA\Response(
+     * response=400,
+     * description="Erro na deleção (curso não encontrado ou outro erro)"
+     * )
+     * )
+     */
     public function destroy(string $id)
     {
         try {
