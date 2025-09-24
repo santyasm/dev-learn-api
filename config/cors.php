@@ -9,6 +9,7 @@ return [
     'allowed_origins' => [
         'http://localhost:3000',
         'https://dev-learn-front-ua6z.vercel.app',
+        'https://dev-learn-front.vercel.app',
     ],
 
     'allowed_origins_patterns' => [],
