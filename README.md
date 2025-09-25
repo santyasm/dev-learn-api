@@ -1,3 +1,3 @@
 # Dev Learn API
 
-### 🔗 [Documentação](https://dev-learn-api-main.laravel.cloud/api/documentation)
+### 🔗 <a href="https://dev-learn-api-main.laravel.cloud/api/documentation" target="_blank">Documentação</a>

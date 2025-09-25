@@ -24,10 +24,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- Rotas de VIDEOS RESTRITAS (apenas para admins) ---
     Route::middleware('admin.only')->group(function () {
+        // Video
         Route::post('/videos', [VideoController::class, 'store']);
         Route::put('/videos/{id}', [VideoController::class, 'update']);
         Route::post('/videos/import', [VideoController::class, 'importVideosFromGumletPlaylist']);
         Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
+
+        // Enrollment
+        Route::get('/enrollments', [EnrollmentController::class, 'index']);
     });
 
     // Rotas de USUÁRIOS
@@ -41,7 +45,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Rotas de MATRÍCULAS
-    Route::apiResource('/enrollments', EnrollmentController::class);
+    Route::apiResource('/enrollments', EnrollmentController::class)->except('index');
+
     Route::get('/user/enrollments', [EnrollmentController::class, "getMyEnrollments"]);
 
     Route::post('/videos/{enrollment}/{video}/complete', [VideoProgressController::class, 'store'])

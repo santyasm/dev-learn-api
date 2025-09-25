@@ -548,6 +548,245 @@
                 ]
             }
         },
+        "/api/enrollments": {
+            "get": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Lista todas as matrículas (APENAS ADMIN)",
+                "description": "Retorna uma lista de todas as matrículas no sistema. Requer autenticação e role 'admin'.",
+                "operationId": "e10c9170029fc2712ce897b551063cbf",
+                "responses": {
+                    "200": {
+                        "description": "Lista de matrículas retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Enrollment"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Proibido: Apenas admin pode realizar esta ação"
+                    },
+                    "500": {
+                        "description": "Erro interno no servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Cria uma nova matrícula",
+                "description": "Cria uma matrícula. O user_id deve ser o ID do usuário logado, a menos que o usuário logado seja 'admin'.",
+                "operationId": "b5e369b8961e3cc480e849055f0fed5e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "course_id",
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "course_id": {
+                                        "description": "ID do Curso",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "user_id": {
+                                        "description": "ID do Usuário",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Matrícula criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Enrollment"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Não Autorizado: Tentativa de matricular outro usuário sem ser admin"
+                    },
+                    "500": {
+                        "description": "Erro no registro da matrícula"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/enrollments/{id}": {
+            "get": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Mostra detalhes de uma matrícula",
+                "description": "Retorna os detalhes de uma matrícula específica, incluindo o curso e vídeos. Apenas o usuário dono da matrícula pode acessá-la.",
+                "operationId": "82a31a061d70a7170f1b281b5c0d421b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID da matrícula",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes da matrícula retornados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Enrollment"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Não Autorizado: Matrícula pertence a outro usuário."
+                    },
+                    "404": {
+                        "description": "Matrícula não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Atualiza uma matrícula",
+                "description": "Atualiza os dados de uma matrícula pelo ID. Normalmente usado apenas para atualizar o progresso (progress).",
+                "operationId": "51f3156899bf0eca687d2e3b59b2620c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID da matrícula",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "progress": {
+                                        "description": "Progresso do curso (0.0 a 100.0)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Matrícula atualizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Enrollment"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Matrícula não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/enrollments": {
+            "get": {
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "Lista as matrículas do usuário logado",
+                "description": "Retorna todas as matrículas associadas ao usuário autenticado.",
+                "operationId": "1c44214786ba712d7b02f50019c3753a",
+                "responses": {
+                    "200": {
+                        "description": "Lista de matrículas do usuário retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Enrollment"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/videos": {
             "get": {
                 "tags": [
@@ -948,6 +1187,43 @@
                 },
                 "type": "object"
             },
+            "Enrollment": {
+                "title": "Enrollment",
+                "description": "Matrícula de um usuário em um curso",
+                "properties": {
+                    "id": {
+                        "description": "UUID da matrícula",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "course_id": {
+                        "description": "ID do curso matriculado",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "user_id": {
+                        "description": "ID do usuário matriculado",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "progress": {
+                        "description": "Progresso do curso (0.0 a 100.0)",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "created_at": {
+                        "description": "Data de criação",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Data da última atualização",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "title": "User",
                 "description": "User model",
@@ -1064,6 +1340,10 @@
         {
             "name": "Courses",
             "description": "Courses"
+        },
+        {
+            "name": "Enrollments",
+            "description": "Enrollments"
         },
         {
             "name": "Videos",
