@@ -48,9 +48,8 @@ cp .env.example .env
 ```
 
 Edite o arquivo .env e configure as credenciais do seu banco de dados MySQL:
-Ini, TOML
 
-```TOML
+```Ini,TOML
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
