@@ -41,13 +41,13 @@ cd dev-learn-api
 
 ### 2. Configurar Variáveis de Ambiente
 
-Crie o arquivo .env a partir do exemplo fornecido:
+Crie o arquivo `.env` a partir do exemplo fornecido:
 
 ```bash
 cp .env.example .env
 ```
 
-Edite o arquivo .env e configure as credenciais do seu banco de dados MySQL:
+Edite o arquivo `.env` e configure as credenciais do seu banco de dados MySQL:
 
 ```Ini,TOML
 DB_CONNECTION=mysql
@@ -127,6 +127,46 @@ O servidor da API está disponível em:
 | **Listar Vídeos Concluídos da Matrícula** | GET       | `/enrollments/{enrollment}/completed-videos`                       | Autenticado                         |
 
 > 🔗 Para mais detalhes sobre parâmetros, respostas e exemplos de uso, consulte a [documentação completa no Swagger](https://dev-learn-api-main.laravel.cloud/api/documentation).
+
+## 🎬 Integração com Gumlet
+
+A API utiliza o [Gumlet Video](https://www.gumlet.com/) para gerenciamento e importação de vídeos de forma otimizada.
+Com isso, é possível importar automaticamente todos os vídeos de uma playlist do Gumlet e vinculá-los a um curso da plataforma.
+
+### 🔹 Variáveis de Ambiente
+
+No arquivo `.env`, configure os seguintes valores:
+
+```Ini,TOML
+GUMLET_API_KEY=your_gumlet_key
+GUMLET_API_BASE_URL=https://api.gumlet.com/v1/
+GUMLET_API_COLLECTION_ID=your_gumlet_collection_id
+```
+
+| Recurso / Descrição             | Método | URL              | Acesso |
+| ------------------------------- | ------ | ---------------- | ------ |
+| **Importar Vídeos da Playlist** | POST   | `/videos/import` | Admin  |
+
+#### Exemplo de Payload:
+
+```json
+{
+    "course_id": "uuid-do-curso",
+    "playlist_id": "id-da-playlist-no-gumlet"
+}
+```
+
+#### Funcionamento:
+
+1. Os vídeos já existentes do curso informado são removidos.
+
+2. Os vídeos da playlist no Gumlet são buscados via API.
+
+3. Cada vídeo é criado na base local com título, descrição, duração e ordem.
+
+4. A duração total do curso é atualizada automaticamente.
+
+5. A resposta retorna os dados da playlist importada.
 
 ---
 
