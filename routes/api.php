@@ -8,6 +8,10 @@ use App\Http\Controllers\VideoController;
 use App\Http\Controllers\VideoProgressController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return view('api-welcome');
+});
+
 Route::controller(AuthController::class)->group(function () {
     Route::post('/auth/register', 'register');
     Route::post('/auth/login', 'login');
