@@ -5,13 +5,40 @@ namespace App\Http\Controllers;
 use App\Models\Enrollment;
 use App\Models\Video;
 use App\Models\VideoProgress;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class VideoProgressController extends Controller
 {
     /**
-     * Marcar vídeo como concluído
+     * @OA\Post(
+     * path="/api/videos/{enrollment}/{video}/complete",
+     * operationId="markVideoComplete",
+     * tags={"Video Progress"},
+     * summary="Marca um vídeo como concluído",
+     * description="Registra ou garante que um vídeo específico de uma matrícula está marcado como concluído. Apenas o dono da matrícula pode executar esta ação.",
+     * security={{"bearerAuth": {}}},
+     * @OA\Parameter(
+     * name="enrollment",
+     * in="path",
+     * required=true,
+     * description="UUID da matrícula",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\Parameter(
+     * name="video",
+     * in="path",
+     * required=true,
+     * description="UUID do vídeo a ser marcado",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Vídeo marcado como concluído com sucesso",
+     * @OA\JsonContent(ref="#/components/schemas/VideoProgress")
+     * ),
+     * @OA\Response(response=403, description="Não autorizado (a matrícula não pertence ao usuário logado)"),
+     * @OA\Response(response=404, description="Matrícula ou Vídeo não encontrados no contexto do curso")
+     * )
      */
     public function store($enrollmentId, $videoId)
     {
@@ -36,6 +63,36 @@ class VideoProgressController extends Controller
         ], 201);
     }
 
+    /**
+     * @OA\Delete(
+     * path="/api/videos/{enrollment}/{video}/complete",
+     * operationId="unmarkVideoComplete",
+     * tags={"Video Progress"},
+     * summary="Remove a marcação de conclusão de um vídeo",
+     * description="Remove o registro de conclusão de um vídeo específico. Apenas o dono da matrícula pode executar esta ação.",
+     * security={{"bearerAuth": {}}},
+     * @OA\Parameter(
+     * name="enrollment",
+     * in="path",
+     * required=true,
+     * description="UUID da matrícula",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\Parameter(
+     * name="video",
+     * in="path",
+     * required=true,
+     * description="UUID do vídeo a ser desmarcado",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Conclusão removida com sucesso"
+     * ),
+     * @OA\Response(response=403, description="Não autorizado (a matrícula não pertence ao usuário logado)"),
+     * @OA\Response(response=404, description="Matrícula ou registro de conclusão não encontrados")
+     * )
+     */
     public function destroy($enrollmentId, $videoId)
     {
         $user = Auth::user();
@@ -62,7 +119,30 @@ class VideoProgressController extends Controller
     }
 
     /**
-     * Listar vídeos concluídos do user
+     * @OA\Get(
+     * path="/api/enrollments/{enrollment}/completed-videos",
+     * operationId="listCompletedVideos",
+     * tags={"Video Progress"},
+     * summary="Lista os vídeos concluídos de uma matrícula",
+     * description="Retorna uma lista de IDs dos vídeos concluídos dentro de uma matrícula específica. Apenas o dono da matrícula pode acessá-la.",
+     * security={{"bearerAuth": {}}},
+     * @OA\Parameter(
+     * name="enrollment",
+     * in="path",
+     * required=true,
+     * description="UUID da matrícula",
+     * @OA\Schema(type="string", format="uuid")
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Lista de IDs retornada com sucesso",
+     * @OA\JsonContent(
+     * @OA\Property(property="data", type="array", @OA\Items(type="string", format="uuid", description="ID do Vídeo Concluído"))
+     * )
+     * ),
+     * @OA\Response(response=403, description="Não autorizado (a matrícula não pertence ao usuário logado)"),
+     * @OA\Response(response=404, description="Matrícula não encontrada")
+     * )
      */
     public function index($enrollmentId)
     {

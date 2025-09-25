@@ -1105,6 +1105,162 @@
                     }
                 ]
             }
+        },
+        "/api/videos/{enrollment}/{video}/complete": {
+            "post": {
+                "tags": [
+                    "Video Progress"
+                ],
+                "summary": "Marca um vídeo como concluído",
+                "description": "Registra ou garante que um vídeo específico de uma matrícula está marcado como concluído. Apenas o dono da matrícula pode executar esta ação.",
+                "operationId": "markVideoComplete",
+                "parameters": [
+                    {
+                        "name": "enrollment",
+                        "in": "path",
+                        "description": "UUID da matrícula",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "video",
+                        "in": "path",
+                        "description": "UUID do vídeo a ser marcado",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Vídeo marcado como concluído com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VideoProgress"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Não autorizado (a matrícula não pertence ao usuário logado)"
+                    },
+                    "404": {
+                        "description": "Matrícula ou Vídeo não encontrados no contexto do curso"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Video Progress"
+                ],
+                "summary": "Remove a marcação de conclusão de um vídeo",
+                "description": "Remove o registro de conclusão de um vídeo específico. Apenas o dono da matrícula pode executar esta ação.",
+                "operationId": "unmarkVideoComplete",
+                "parameters": [
+                    {
+                        "name": "enrollment",
+                        "in": "path",
+                        "description": "UUID da matrícula",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "video",
+                        "in": "path",
+                        "description": "UUID do vídeo a ser desmarcado",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conclusão removida com sucesso"
+                    },
+                    "403": {
+                        "description": "Não autorizado (a matrícula não pertence ao usuário logado)"
+                    },
+                    "404": {
+                        "description": "Matrícula ou registro de conclusão não encontrados"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/enrollments/{enrollment}/completed-videos": {
+            "get": {
+                "tags": [
+                    "Video Progress"
+                ],
+                "summary": "Lista os vídeos concluídos de uma matrícula",
+                "description": "Retorna uma lista de IDs dos vídeos concluídos dentro de uma matrícula específica. Apenas o dono da matrícula pode acessá-la.",
+                "operationId": "listCompletedVideos",
+                "parameters": [
+                    {
+                        "name": "enrollment",
+                        "in": "path",
+                        "description": "UUID da matrícula",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de IDs retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "description": "ID do Vídeo Concluído",
+                                                "type": "string",
+                                                "format": "uuid"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Não autorizado (a matrícula não pertence ao usuário logado)"
+                    },
+                    "404": {
+                        "description": "Matrícula não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1322,6 +1478,38 @@
                     }
                 },
                 "type": "object"
+            },
+            "VideoProgress": {
+                "title": "VideoProgress",
+                "description": "Registro de vídeo concluído por um usuário em uma matrícula",
+                "properties": {
+                    "id": {
+                        "description": "UUID do registro de progresso",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "enrollment_id": {
+                        "description": "ID da matrícula",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "video_id": {
+                        "description": "ID do vídeo concluído",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "created_at": {
+                        "description": "Data de marcação como concluído",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Data da última atualização",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -1348,6 +1536,10 @@
         {
             "name": "Videos",
             "description": "Videos"
+        },
+        {
+            "name": "Video Progress",
+            "description": "Video Progress"
         }
     ]
 }
