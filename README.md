@@ -2,7 +2,7 @@
 
 Uma API RESTful para um sistema de gestão de cursos e progresso de aprendizado, construída sobre o framework **Laravel 12** e documentada com **OpenAPI (Swagger)**.
 
----
+## [![Swagger Documentation](https://img.shields.io/badge/Swagger-Documentation-green?style=for-the-badge&logo=swagger)](https://dev-learn-api-main.laravel.cloud/api/documentation)
 
 ### 🚀 Tecnologias e Versões
 
