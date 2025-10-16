@@ -28,13 +28,14 @@
     # Instala dependências do Composer
     RUN composer install --no-dev --optimize-autoloader --no-scripts
     
-    # MUDANÇA AQUI: Copia e torna o script de inicialização executável
+    RUN php artisan vendor:publish --tag=l5-swagger-assets --force
+    
     COPY start.sh /usr/local/bin/start.sh
     RUN chmod +x /usr/local/bin/start.sh
     
     # Ajusta permissões
     RUN chown -R www-data:www-data /var/www/html
-    
+
     EXPOSE 8080
     
     CMD ["start.sh"]
