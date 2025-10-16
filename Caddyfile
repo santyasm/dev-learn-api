@@ -1,0 +1,16 @@
+{
+    http_port {$PORT}
+}
+
+# Configuração do seu site
+:{$PORT} {
+    root * /var/www/html/public
+
+    encode zstd gzip
+
+    php_fastcgi localhost:9000
+
+    file_server
+
+    log
+}
