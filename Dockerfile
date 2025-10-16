@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /var/www/html
 
 # Copia toda a aplicação
-COPY --chown=www-data:www-data . .
+COPY . .
 
 # Copia vendor do stage 1
 COPY --from=vendor /app/vendor ./vendor
@@ -57,14 +57,20 @@ COPY --from=vendor /app/vendor ./vendor
 # Copia build do Vite do stage 2
 COPY --from=node_assets /app/public/build ./public/build
 
+# Ajusta permissões dos arquivos
 RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Ajusta permissões
-RUN chown -R www-data:www-data storage bootstrap/cache \
- && chmod -R 775 storage bootstrap/cache
-
-# Configura DocumentRoot para servir assets corretamente
-RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+# 1. Define DocumentRoot para a pasta public.
+# 2. Adiciona o bloco <Directory> para permitir acesso e processar .htaccess.
+RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#g' /etc/apache2/sites-available/000-default.conf && \
+    sed -i '/<Directory \/var\/www\/html>/a \
+        \n \
+        <Directory /var/www/html/public>\n \
+            Options Indexes FollowSymLinks\n \
+            AllowOverride All\n \
+            Require all granted\n \
+        </Directory>' /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 8080
 
