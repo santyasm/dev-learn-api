@@ -13,13 +13,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 #########################
 FROM node:22 AS node_assets
 WORKDIR /app
-
-# Copia arquivos necessários para Vite
 COPY package*.json ./
 COPY vite.config.js ./
-COPY tsconfig.json ./
 COPY resources/ ./resources
-
 RUN npm install
 RUN npm run build
 
