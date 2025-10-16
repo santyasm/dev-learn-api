@@ -9,9 +9,6 @@ FROM node:18 as node_assets
 WORKDIR /app
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-COPY vite.config.js vite.config.js
-COPY postcss.config.js postcss.config.js
-COPY tailwind.config.js tailwind.config.js
 COPY resources/ resources/
 RUN npm install
 RUN npm run build
