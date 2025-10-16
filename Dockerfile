@@ -7,11 +7,15 @@ RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist --
 
 FROM node:22 as node_assets
 WORKDIR /app
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-COPY resources/ resources/
+
+COPY package*.json ./
+COPY vite.config.js ./
+COPY resources/ ./resources
+COPY tsconfig.json ./
+
 RUN npm install
 RUN npm run build
+
 
 FROM php:8.2-apache
 RUN a2enmod rewrite
