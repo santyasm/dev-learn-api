@@ -12,7 +12,7 @@
     WORKDIR /app
     # Copia os arquivos de configuração e dependências
     COPY package.json package-lock.json ./
-    COPY vite.config.js tailwind.config.js postcss.config.js ./
+    COPY vite.config.js ./
     # Copia os arquivos brutos que serão compilados
     COPY resources/ resources/
     
