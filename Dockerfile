@@ -1,29 +1,32 @@
-FROM php:8.2-cli
+FROM composer:2.7 as vendor
+WORKDIR /app
+COPY database/ database/
+COPY composer.json composer.json
+COPY composer.lock composer.lock
+RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist --no-dev --optimize-autoloader
 
+FROM node:18 as node_assets
+WORKDIR /app
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+COPY vite.config.js vite.config.js
+COPY postcss.config.js postcss.config.js
+COPY tailwind.config.js tailwind.config.js
+COPY resources/ resources/
+RUN npm install
+RUN npm run build
+
+FROM php:8.2-apache
+RUN a2enmod rewrite
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
     libpq-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd
+    libzip-dev \
+    unzip \
+    && docker-php-ext-install pdo pdo_pgsql zip bcmath
 
-WORKDIR /var/www
+COPY --chown=www-data:www-data . /var/www/html
+COPY --from=vendor /app/vendor/ /var/www/html/vendor/
+COPY --from=node_assets /app/public/build/ /var/www/html/public/build/
 
-COPY . .
-
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-RUN php artisan config:cache \
- && php artisan route:cache \
- && php artisan view:cache
-
-EXPOSE 8080
-
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
