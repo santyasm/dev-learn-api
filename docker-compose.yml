@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: dev-learn-api
+    ports:
+      - "3002:80"
+    depends_on:
+      - db
+    env_file:
+      - .env.production
+    volumes:
+      - .:/var/www/html
+    command: sh -c "cp .env.production .env && php artisan config:cache && apache2-foreground"
+
+  db:
+    image: postgres:16
+    container_name: dev-learn-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
