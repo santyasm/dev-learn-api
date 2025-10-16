@@ -63,7 +63,7 @@ return [
             'security' => [],
         ],
 
-        'generate_always' => env('L5_SWAGGER_GENERATE_ALWAYS', false),
+        'generate_always' => env('L5_SWAGGER_GENERATE_ALWAYS', true),
         'generate_yaml_copy' => env('L5_SWAGGER_GENERATE_YAML_COPY', false),
         'proxy' => false,
         'additional_config_url' => null,
