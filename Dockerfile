@@ -36,8 +36,6 @@ RUN echo '<VirtualHost *:80>\n\
 # Habilita o mod_rewrite do Apache
 RUN a2enmod rewrite
 
-# Expõe a porta 80
-EXPOSE 80
+EXPOSE 8080
 
-# Comando padrão do container
-CMD ["apache2-foreground"]
+CMD sh -c "sed -i 's/Listen 80/Listen ${PORT:-8080}/g' /etc/apache2/ports.conf && apache2-foreground"
