@@ -4,8 +4,17 @@
 FROM composer:2.7 AS vendor
 WORKDIR /app
 
-# Copia apenas arquivos do Composer
+# Copia arquivos necessários para rodar composer
 COPY composer.json composer.lock ./
+COPY artisan ./
+COPY app/ app/
+COPY bootstrap/ bootstrap/
+COPY config/ config/
+COPY database/ database/
+COPY routes/ routes/
+COPY resources/ resources/
+COPY .env.example .env
+
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 #########################
@@ -13,9 +22,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 #########################
 FROM node:22 AS node_assets
 WORKDIR /app
+
 COPY package*.json ./
 COPY vite.config.js ./
 COPY resources/ ./resources
+
 RUN npm install
 RUN npm run build
 
@@ -24,28 +35,24 @@ RUN npm run build
 #########################
 FROM php:8.2-apache
 
-# Ativa mod_rewrite
 RUN a2enmod rewrite
-
-# Instala extensões PHP necessárias
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     unzip \
     && docker-php-ext-install pdo pdo_pgsql zip bcmath
 
-# Diretório de trabalho
 WORKDIR /var/www/html
 
-# Copia o Laravel e assets já buildados
+# Copia a aplicação
 COPY --chown=www-data:www-data . .
+# Copia vendor da stage 1
 COPY --from=vendor /app/vendor ./vendor
+# Copia build do Vite da stage 2
 COPY --from=node_assets /app/public/build ./public/build
 
-# Permissões
 RUN chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
-
 CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
