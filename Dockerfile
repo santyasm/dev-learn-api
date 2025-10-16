@@ -1,7 +1,7 @@
 #########################
 # Stage 1: Composer (PHP dependencies)
 #########################
-FROM composer:2.7 AS vendor
+FROM php:8.2-apache
 WORKDIR /app
 
 # Copia arquivos necessários para rodar composer
@@ -65,5 +65,12 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 8080
+
+# Copia as configurações do Apache para ouvir na porta correta do Railway
+COPY .docker/apache/ports.conf /etc/apache2/ports.conf
+COPY .docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+RUN echo "export APACHE_PORT=${PORT}" >> /etc/apache2/envvars
+
 # CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
 CMD ["apache2-foreground"] 
