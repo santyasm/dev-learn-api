@@ -57,6 +57,8 @@ COPY --from=vendor /app/vendor ./vendor
 # Copia build do Vite do stage 2
 COPY --from=node_assets /app/public/build ./public/build
 
+RUN chown -R www-data:www-data /var/www/html
+
 # Ajusta permissões
 RUN chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
