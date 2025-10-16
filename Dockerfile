@@ -64,8 +64,6 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 # Configura DocumentRoot para servir assets corretamente
 RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
 
-# Expõe porta
-EXPOSE 80
+EXPOSE 8080
 
-# Inicia Apache em foreground
-CMD ["apache2-foreground"]
+CMD sh -c "sed -i 's/Listen 80/Listen ${PORT:-8080}/g' /etc/apache2/ports.conf && apache2-foreground"
