@@ -25,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.only' => \App\Http\Middleware\AdminOnly::class,
         ]);
     })
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
+    })
     ->withProviders([
         App\Providers\SwaggerServiceProvider::class,
     ])

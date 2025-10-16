@@ -3,7 +3,7 @@ FROM node:20-alpine AS node_assets
 WORKDIR /app
 COPY package.json package-lock.json ./
 # MUDANÇA CRÍTICA: Copia a configuração do Vite e do PostCSS
-COPY vite.config.js postcss.config.js ./
+COPY vite.config.js ./
 COPY resources/ resources/
 RUN npm install
 RUN npm run build
