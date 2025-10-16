@@ -54,8 +54,10 @@ COPY --from=node_assets /app/public/build ./public/build
 RUN chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
-EXPOSE 8080
-
+# Copiar entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 8080
+CMD ["apache2-foreground"]
