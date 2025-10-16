@@ -1,40 +1,51 @@
-FROM php:8.3.11-fpm
+#########################
+# Stage 1: Composer (PHP dependencies)
+#########################
+FROM composer:2.7 AS vendor
+WORKDIR /app
 
-# Update package list and install dependencies
+# Copia apenas arquivos do Composer
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+#########################
+# Stage 2: Node (Vite build)
+#########################
+FROM node:22 AS node_assets
+WORKDIR /app
+COPY package*.json ./
+COPY vite.config.js ./
+COPY resources/ ./resources
+RUN npm install
+RUN npm run build
+
+#########################
+# Stage 3: PHP + Apache (final image)
+#########################
+FROM php:8.2-apache
+
+# Ativa mod_rewrite
+RUN a2enmod rewrite
+
+# Instala extensões PHP necessárias
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg-dev \
-    libwebp-dev \
-    libxpm-dev \
-    libfreetype6-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    git \
-    bash \
-    fcgiwrap \
-    libmcrypt-dev \
-    libonig-dev \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libzip-dev \
+    unzip \
+    && docker-php-ext-install pdo pdo_pgsql zip bcmath
 
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install gd \
-    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath opcache
+# Diretório de trabalho
+WORKDIR /var/www/html
 
-# Install Composer
-COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
+# Copia o Laravel e assets já buildados
+COPY --chown=www-data:www-data . .
+COPY --from=vendor /app/vendor ./vendor
+COPY --from=node_assets /app/public/build ./public/build
 
-# Copy existing application directory contents
-COPY . /var/www/html/
+# Permissões
+RUN chown -R www-data:www-data storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache
 
-# Set ownership and permissions for the /var/www/html directory to www-data
-RUN chown -R www-data:www-data /var/www/html/
+EXPOSE 8080
 
-USER www-data
-
-EXPOSE 9000
-
-CMD ["php-fpm"]
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
