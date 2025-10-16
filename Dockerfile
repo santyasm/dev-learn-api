@@ -4,7 +4,8 @@ RUN apt-get update && apt-get install -y \
         git \
         unzip \
         libzip-dev \
-    && docker-php-ext-install zip pdo pdo_mysql \
+        libpq-dev \
+    && docker-php-ext-install zip pdo pdo_pgsql \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala o Composer
@@ -19,7 +20,6 @@ COPY . .
 # Instala dependências Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-
 # Dá permissão às pastas necessárias
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
@@ -32,7 +32,6 @@ RUN echo '<VirtualHost *:80>\n\
         Require all granted\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
-
 
 # Habilita o mod_rewrite do Apache
 RUN a2enmod rewrite
