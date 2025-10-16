@@ -58,20 +58,22 @@ COPY --from=vendor /app/vendor ./vendor
 COPY --from=node_assets /app/public/build ./public/build
 
 # Ajusta permissões dos arquivos
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 1. Define DocumentRoot para a pasta public.
-# 2. Adiciona o bloco <Directory> para permitir acesso e processar .htaccess.
-RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#g' /etc/apache2/sites-available/000-default.conf && \
-    sed -i '/<Directory \/var\/www\/html>/a \
-        \n \
-        <Directory /var/www/html/public>\n \
-            Options Indexes FollowSymLinks\n \
-            AllowOverride All\n \
-            Require all granted\n \
-        </Directory>' /etc/apache2/sites-available/000-default.conf
+# Define DocumentRoot para public
+RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
 
+# Cria bloco de configuração para Laravel e habilita
+RUN echo '<Directory /var/www/html/public>\n\
+    Options Indexes FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' > /etc/apache2/conf-available/laravel.conf && \
+    a2enconf laravel
+
+# Expõe a porta definida pelo Railway
 EXPOSE 8080
 
+# Inicia Apache na porta correta
 CMD sh -c "sed -i 's/Listen 80/Listen ${PORT:-8080}/g' /etc/apache2/ports.conf && apache2-foreground"
