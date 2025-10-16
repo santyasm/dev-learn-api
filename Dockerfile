@@ -35,24 +35,34 @@ RUN npm run build
 #########################
 FROM php:8.2-apache
 
+# Habilita mod_rewrite
 RUN a2enmod rewrite
+
+# Instala extensões PHP necessárias
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     unzip \
     && docker-php-ext-install pdo pdo_pgsql zip bcmath
 
+# Define diretório da aplicação
 WORKDIR /var/www/html
 
-# Copia a aplicação
+# Copia toda a aplicação
 COPY --chown=www-data:www-data . .
-# Copia vendor da stage 1
+
+# Copia vendor do stage 1
 COPY --from=vendor /app/vendor ./vendor
-# Copia build do Vite da stage 2
+
+# Copia build do Vite do stage 2
 COPY --from=node_assets /app/public/build ./public/build
 
+# Ajusta permissões
 RUN chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
+
+# Configura DocumentRoot para servir assets corretamente
+RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 8080
 CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
