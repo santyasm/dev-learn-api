@@ -12,4 +12,4 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 
-CMD php -S 0.0.0.0:${PORT:-8000} -t public
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8000} -t public"]
