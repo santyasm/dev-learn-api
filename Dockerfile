@@ -55,4 +55,7 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
-CMD php artisan migrate --force && php -S 0.0.0.0:${PORT:-8080} -t public
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
