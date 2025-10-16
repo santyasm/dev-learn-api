@@ -5,7 +5,7 @@ COPY composer.json composer.json
 COPY composer.lock composer.lock
 RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist --no-dev --optimize-autoloader
 
-FROM node:18 as node_assets
+FROM node:22 as node_assets
 WORKDIR /app
 COPY package.json package.json
 COPY package-lock.json package-lock.json
