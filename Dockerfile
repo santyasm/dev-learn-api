@@ -1,8 +1,11 @@
-# Etapa 1: dependências PHP e Apache
 FROM php:8.2-apache
 
-# Habilita módulos necessários
-RUN docker-php-ext-install pdo pdo_mysql
+RUN apt-get update && apt-get install -y \
+        git \
+        unzip \
+        libzip-dev \
+    && docker-php-ext-install zip pdo pdo_mysql \
+    && rm -rf /var/lib/apt/lists/*
 
 # Instala o Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
