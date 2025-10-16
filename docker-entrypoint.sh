@@ -9,7 +9,9 @@ fi
 
 # Executa migrations (ignora erros se já rodadas)
 echo "Rodando migrations..."
-php artisan migrate --force || true
+# php artisan migrate --force || true
+php artisan migrate:fresh --force || true
+
 
 # Permissões (apenas para garantir)
 chown -R www-data:www-data storage bootstrap/cache
