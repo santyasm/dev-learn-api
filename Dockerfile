@@ -1,76 +1,40 @@
-#########################
-# Stage 1: Composer (PHP dependencies)
-#########################
-FROM php:8.2-apache
-WORKDIR /app
+FROM php:8.3.11-fpm
 
-# Copia arquivos necessários para rodar composer
-COPY composer.json composer.lock ./
-COPY artisan ./
-COPY app/ app/
-COPY bootstrap/ bootstrap/
-COPY config/ config/
-COPY database/ database/
-COPY routes/ routes/
-COPY resources/ resources/
-COPY .env.example .env
-
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-#########################
-# Stage 2: Node (Vite build)
-#########################
-FROM node:22 AS node_assets
-WORKDIR /app
-
-COPY package*.json ./
-COPY vite.config.js ./
-COPY resources/ ./resources
-
-RUN npm install
-RUN npm run build
-
-#########################
-# Stage 3: PHP + Apache (final image)
-#########################
-FROM php:8.2-apache
-
-# Habilita mod_rewrite
-RUN a2enmod rewrite
-
-# Instala extensões PHP necessárias
+# Update package list and install dependencies
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
+    build-essential \
+    libpng-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libxpm-dev \
+    libfreetype6-dev \
     libzip-dev \
+    zip \
     unzip \
-    && docker-php-ext-install pdo pdo_pgsql zip bcmath
+    git \
+    bash \
+    fcgiwrap \
+    libmcrypt-dev \
+    libonig-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Define diretório da aplicação
-WORKDIR /var/www/html
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install gd \
+    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath opcache
 
-# Copia toda a aplicação
-COPY --chown=www-data:www-data . .
+# Install Composer
+COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
 
-# Copia vendor do stage 1
-COPY --from=vendor /app/vendor ./vendor
+# Copy existing application directory contents
+COPY . /var/www/html/
 
-# Copia build do Vite do stage 2
-COPY --from=node_assets /app/public/build ./public/build
+# Set ownership and permissions for the /var/www/html directory to www-data
+RUN chown -R www-data:www-data /var/www/html/
 
-# Ajusta permissões
-RUN chown -R www-data:www-data storage bootstrap/cache \
- && chmod -R 775 storage bootstrap/cache
+USER www-data
 
-# Configura DocumentRoot para servir assets corretamente
-RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+EXPOSE 9000
 
-EXPOSE 8080
-
-# Copia as configurações do Apache para ouvir na porta correta do Railway
-COPY .docker/apache/ports.conf /etc/apache2/ports.conf
-COPY .docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
-
-RUN echo "export APACHE_PORT=${PORT}" >> /etc/apache2/envvars
-
-# CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
-CMD ["apache2-foreground"] 
+CMD ["php-fpm"]
