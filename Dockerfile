@@ -51,14 +51,8 @@ COPY --from=vendor /app/vendor ./vendor
 # Copia build do Vite da stage 2
 COPY --from=node_assets /app/public/build ./public/build
 
-# Copiar entrypoint
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
-
 RUN chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
 CMD php artisan migrate --force && php -S 0.0.0.0:${PORT:-8080} -t public
-
