@@ -1,5 +1,4 @@
 {
-    php_fpm php-fpm
     http_port {$PORT}
 }
 
