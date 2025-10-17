@@ -2,7 +2,7 @@
 
 Uma API RESTful para um sistema de gestão de cursos e progresso de aprendizado, construída sobre o framework **Laravel 12** e documentada com **OpenAPI (Swagger)**.
 
-## [![Swagger Documentation](https://img.shields.io/badge/Swagger-Documentation-green?style=for-the-badge&logo=swagger)](https://dev-learn-api-main.laravel.cloud/api/documentation)
+## [![Swagger Documentation](https://img.shields.io/badge/Swagger-Documentation-green?style=for-the-badge&logo=swagger)](https://dev-learn-api.onrender.com/api/documentation)
 
 ### 🚀 Tecnologias e Versões
 
@@ -91,14 +91,14 @@ php artisan serve
 ## 🌐 Acesso à API e Documentação
 
 O servidor da API está disponível em:  
-**[https://dev-learn-api-main.laravel.cloud](https://dev-learn-api-main.laravel.cloud)**
+**[https://dev-learn-api.onrender.com](https://dev-learn-api.onrender.com)**
 
 ### 🔹 Endpoints Principais
 
 | Recurso / Descrição                       | Método    | URL                                                                | Acesso                              |
 | ----------------------------------------- | --------- | ------------------------------------------------------------------ | ----------------------------------- |
-| **API Base**                              | -         | [Link](https://dev-learn-api-main.laravel.cloud/api)               | Público                             |
-| **Documentação (Swagger)**                | -         | [Link](https://dev-learn-api-main.laravel.cloud/api/documentation) | Público                             |
+| **API Base**                              | -         | [Link](https://dev-learn-api.onrender.com/api)                     | Público                             |
+| **Documentação (Swagger)**                | -         | [Link](https://dev-learn-api.onrender.com/api/documentation)       | Público                             |
 | **Registrar Usuário**                     | POST      | `/auth/register`                                                   | Público                             |
 | **Login**                                 | POST      | `/auth/login`                                                      | Público                             |
 | **Listar Cursos**                         | GET       | `/courses`                                                         | Público (opcionalmente autenticado) |
@@ -126,7 +126,7 @@ O servidor da API está disponível em:
 | **Desmarcar Vídeo Concluído**             | DELETE    | `/videos/{enrollment}/{video}/complete`                            | Autenticado                         |
 | **Listar Vídeos Concluídos da Matrícula** | GET       | `/enrollments/{enrollment}/completed-videos`                       | Autenticado                         |
 
-> 🔗 Para mais detalhes sobre parâmetros, respostas e exemplos de uso, consulte a [documentação completa no Swagger](https://dev-learn-api-main.laravel.cloud/api/documentation).
+> 🔗 Para mais detalhes sobre parâmetros, respostas e exemplos de uso, consulte a [documentação completa no Swagger](https://dev-learn-api.onrender.com/api/documentation).
 
 ## 🎬 Integração com Gumlet
 

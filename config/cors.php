@@ -11,6 +11,7 @@ return [
         'http://localhost:3000',
         'https://dev-learn-front-ua6z.vercel.app',
         'https://dev-learn-front.vercel.app',
+        'https://devlearn.yasminsantana.fun'
     ],
 
     'allowed_origins_patterns' => [],
